@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@milkdown/core": "^7.21.1",
+    "@milkdown/preset-commonmark": "^7.21.1"
+  }
+}

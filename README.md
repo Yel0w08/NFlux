@@ -1,2 +1,3 @@
 # NFlux
-NFlux est une aplication legere de notes 
+
+Nflux is an lightway thath use Tauri + Vanilla
