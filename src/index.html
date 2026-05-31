@@ -1,35 +1,176 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NFlux</title>
-    <script type="module" src="/main.js" defer></script>
-  </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFlux - Notes</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Notes</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" id="searchBtn" title="Search">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="menuBtn" title="Menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-  <body>
-    <main class="container">
-      <h1>Notes</h1>
+            <!-- Search Bar (hidden by default) -->
+            <div class="search-bar" id="searchBar" style="display: none;">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search notes..." autocomplete="off">
+                <button class="close-btn" id="closeSearchBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
 
-      <div class="row">
-        <a href="https://tauri.app" target="_blank">
-          <img src="/assets/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a
-          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
-          target="_blank"
-        >
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Notes Grid -->
+            <div class="notes-grid" id="notesGrid">
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        <line x1="9" y1="9" x2="15" y2="9"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <p>No notes yet</p>
+                    <small>Tap the button below to create your first note</small>
+                </div>
+            </div>
+        </main>
 
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
+        <!-- Floating Action Button -->
+        <button class="fab" id="newNoteBtn" title="New note">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
 
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
-    </main>
-  </body>
+    <!-- Note Editor Modal - Full Screen -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content editor-fullscreen">
+            <!-- Editor Header -->
+            <div class="editor-header">
+                <button class="back-btn" id="backBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <h2 class="editor-title">Edit Note</h2>
+                <button class="preview-toggle-btn" id="previewToggleBtn" title="Preview">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 9l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 15l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button class="settings-btn" id="noteSettingsBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Editor Body -->
+            <div class="editor-body">
+                <input 
+                    type="text" 
+                    class="note-title" 
+                    id="noteTitle" 
+                    placeholder="Title"
+                    maxlength="150"
+                />
+                <textarea 
+                    class="note-content" 
+                    id="noteContent" 
+                    placeholder="Write your note in markdown..."
+                ></textarea>
+            </div>
+            <!-- Preview Container -->
+            <div id="previewContainer" class="preview-container" style="display:none; padding:16px; overflow:auto;" ></div>
+        </div>
+    </div>
+
+    <!-- Note Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <button class="back-btn" id="backFromSettingsBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <h2>Note Settings</h2>
+                <div style="width: 24px;"></div>
+            </div>
+
+            <div class="settings-body">
+                <!-- Color Selection -->
+                <div class="settings-section">
+                    <label class="settings-label">Color</label>
+                    <div class="colors-grid">
+                        <button class="color-btn-large" data-color="white" title="White"></button>
+                        <button class="color-btn-large" data-color="red" title="Red"></button>
+                        <button class="color-btn-large" data-color="orange" title="Orange"></button>
+                        <button class="color-btn-large" data-color="yellow" title="Yellow"></button>
+                        <button class="color-btn-large" data-color="green" title="Green"></button>
+                        <button class="color-btn-large" data-color="teal" title="Teal"></button>
+                        <button class="color-btn-large" data-color="blue" title="Blue"></button>
+                        <button class="color-btn-large" data-color="purple" title="Purple"></button>
+                        <button class="color-btn-large" data-color="pink" title="Pink"></button>
+                        <button class="color-btn-large" data-color="gray" title="Gray"></button>
+                    </div>
+                </div>
+
+                <!-- Metadata -->
+                <div class="settings-section">
+                    <label class="settings-label">Metadata</label>
+                    <div class="metadata-info" id="settingsMetadata"></div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-section danger-zone">
+                    <button class="delete-btn-large" id="deleteNoteBtn">Delete Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Options Menu Modal -->
+    <div class="modal" id="optionsModal">
+        <div class="options-menu">
+            <button class="menu-item" id="settingsGlobalBtn">Settings</button>
+            <button class="menu-item" id="aboutBtn">About</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/lib/marked.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+    <script src="script.js"></script>
+</body>
 </html>
